@@ -7,52 +7,42 @@ llvm-tutor
 
 Example LLVM passes - based on **LLVM 9**
 
-**llvm-tutor** is a collection of self-contained reference LLVM passes. It's a
-tutorial that targets novice and aspiring LLVM developers. Key features:
-  * **Complete** - includes `CMake` build scripts, LIT tests and CI set-up
-  * **Out of source** - builds against a binary LLVM installation (no need to
-    build LLVM from sources)
-  * **Modern** - based on the latest version of LLVM (and updated with every release)
+LLVM -tutor是一个自包含引用LLVM传递的集合。这是一个针对新手和有抱负的LLVM开发人员的教程。关键功能:完成-包括CMake构建脚本，点亮测试和CI设置的源代码-构建一个二进制LLVM安装(不需要从源代码构建LLVM)现代-基于最新版本的LLVM(并更新每一个版本)
 
-### About
-The goal of this LLVM tutorial is to showcase the LLVM API and to demonstrate
-how fun, powerful and easy to work with it can be. The API is demonstrated
-through self-contained, testable examples which are implemented using idiomatic
-LLVM.
+llvm-tutor是一个自包含引用LLVM pass的集合。这是一个针对新手和有抱负的LLVM开发人员的教程。关键功能：
 
-This document explains how to set-up your environment, build the examples
-or go about debugging. It contains a high-level overview of the examples and
-demonstrates how to run them.
+- **完整** - 包括`CMake` 构建脚本, LIT 测试以及CI set-up
+- **无需源码** - 根据LLVM的二进制安装文件进行构建(不需要从源代码构建LLVM)
+- **现代化** - 基于最新版本的LLVM(并更新每一个版本)
 
-The source files, apart from the code itself, contain comments that will guide
-you through the implementation. All examples are complemented with LIT tests
-that verify that each pass works as expected.
 
-For a most basic, introductory example you can go to
-[**HelloWorld**](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/).
-It's an independent sub-project with a dedicated `CMake` script.
+
+### 关于
+本LLVM教程的目的是展示LLVM API并演示使用它的乐趣，功能和便捷性。通过使用惯用的LLVM实现的自包含，可测试的示例来演示API。
+
+本文档说明了如何设置环境，构建示例或进行调试。它包含示例的高级概述，并演示了如何运行它们。
+
+除了代码本身，源文件还包含一些注释，这些注释将指导您完成实现。所有示例均辅以LIT测试，这些测试可验证每次通过是否按预期进行。
+
+最基本的介绍性示例见：[**HelloWorld**](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/)。这是一个带有专用`CMake`脚本的独立子项目。
 
 ### Table of Contents
 * [HelloWorld](#helloworld)
-* [Development Environment](#development-environment)
-* [Building & Testing](#building--testing)
-* [Overview Of The Passes](#overview-of-the-passes)
-* [Debugging](#debugging)
-* [About Pass Managers in LLVM](#about-pass-managers-in-llvm)
+* [开发环境](#development-environment)
+* [构建和测试](#building--testing)
+* [Pass概述](#overview-of-the-passes)
+* [调试](#debugging)
+* [关于LLVM中的PassManager](#about-pass-managers-in-llvm)
 * [Credits & References](#credits)
 * [License](#license)
 
 
 HelloWorld
 ==========
-The **HelloWorld** pass from
-[HelloWorld.cpp](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/HelloWorld.cpp)
-is a self-contained *reference example*. The corresponding
-[CMakeLists.txt](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/CMakeLists.txt)
-implements the minimum set-up for an out-of-source pass.
+[HelloWorld.cpp](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/HelloWorld.cpp)中的**HelloWorld** pass是一个自包含的*参考实施例*。 相应的[CMakeLists.txt](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/CMakeLists.txt)实现了源外pass的最小设置。
 
-For every function defined in the input module, **HelloWord** prints its name
-and the number of arguments that it takes. You can build it like this:
+对于输入模块中定义的每个函数，**HelloWord**均会打印其名称和所用参数的数量。您可以这样构建它：
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 mkdir build
@@ -60,12 +50,12 @@ cd build
 cmake -DLT_LLVM_INSTALL_DIR=$LLVM_DIR <source/dir/llvm/tutor>/HelloWorld/
 make
 ```
-Before you can test it, you need to prepare an input file:
+在测试之前，您需要准备一个输入文件：
 ```bash
 # Generate an llvm test file
 $LLVM_DIR/bin/clang -S -emit-llvm <source/dir/llvm/tutor/>inputs/input_for_hello.c -o input_for_hello.ll
 ```
-Finally, run **HelloWorld** with [**opt**](http://llvm.org/docs/CommandGuide/opt.html):
+最后，通过[**opt**](http://llvm.org/docs/CommandGuide/opt.html)运行**HelloWorld**：
 ```bash
 # Run the pass on the llvm file
 $LLVM_DIR/bin/opt -load-pass-plugin libHelloWorld.dylib -passes=hello-world -disable-output input_for_hello.ll
@@ -79,54 +69,47 @@ $LLVM_DIR/bin/opt -load-pass-plugin libHelloWorld.dylib -passes=hello-world -dis
 (llvm-tutor) Hello from: main
 (llvm-tutor)   number of arguments: 2
 ```
-The **HelloWorld** pass doesn't modify the input module. The `-disable-output`
-flag is used to prevent **opt** from printing the output bitcode file.
+**HelloWorld** pass 不修改输出模块. `-disable-output`标志用于防止**opt**打印bitecode文件。
 
-Development Environment
-=======================
-## Platform Support And Requirements
-This project has been tested on **Linux 18.04** and **Mac OS X 10.14.4**. In
-order to build **llvm-tutor** you will need:
+# 开发环境
+
+## 平台支持和要求
+
+该项目已经在**Linux 18.04**和**Mac OS X 10.14.4**上进行了测试。为了构建**llvm-tutor，**您将需要：
   * LLVM 9
-  * C++ compiler that supports C++14
-  * CMake 3.4.3 or higher
+  * 支持C++ 14的C++编译器
+  * CMake 3.4.3或更高版本
 
-In order to run the passes, you will need:
-  * **clang-9** (to generate input LLVM files)
-  * **opt** (to run the passes)
+为了运行pass，您将需要：
+  * **clang-9** (生成LLVM输入文件)
+  * **opt** (运行pass)
 
-There are additional requirements for tests (these will be satisfied by
-installing LLVM-9):
-  * [**lit**](https://llvm.org/docs/CommandGuide/lit.html) (aka **llvm-lit**,
-    LLVM tool for executing the tests)
-  * [**FileCheck**](https://llvm.org/docs/CommandGuide/lit.html) (LIT
-    requirement, it's used to check whether tests generate the expected output)
+测试还有其他要求（通过安装LLVM-9可以满足这些要求）：
+  * [**lit**](https://llvm.org/docs/CommandGuide/lit.html) (又名 **llvm-lit**，用于执行测试的LLVM工具)
+  * [**FileCheck**](https://llvm.org/docs/CommandGuide/lit.html) (LIT要求，用于检查测试是否生成预期的输出)
 
-## Installing LLVM-9 on Mac OS X
-On Darwin you can install LLVM 9 with [Homebrew](https://brew.sh/):
+## 在Mac OS X上安装LLVM-9
+
+在Darwin上，您可以使用[Homebrew](https://brew.sh/)安装LLVM 9 ：
 ```bash
 brew install llvm@9
 ```
-This will install all the required header files, libraries and tools in
-`/usr/local/opt/llvm/`.
+这将在 `/usr/local/opt/llvm/`中安装所有必需的头文件，库和工具。
 
-## Installing LLVM-9 on Ubuntu
-On Ubuntu Bionic, you can [install modern
-LLVM](https://blog.kowalczyk.info/article/k/how-to-install-latest-clang-6.0-on-ubuntu-16.04-xenial-wsl.html)
-from the official [repository](http://apt.llvm.org/):
+## 在Ubuntu上安装LLVM-9
+
+在Ubuntu Bionic上, 你可以从官方[repository](http://apt.llvm.org/)中安装[LLVM](https://blog.kowalczyk.info/article/k/how-to-install-latest-clang-6.0-on-ubuntu-16.04-xenial-wsl.html)：
 ```bash
 wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
 sudo apt-add-repository "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main"
 sudo apt-get update
 sudo apt-get install -y llvm-9 llvm-9-dev clang-9 llvm-9-tools
 ```
-This will install all the required header files, libraries and tools in
-`/usr/lib/llvm-9/`.
+这将在 `/usr/lib/llvm-9/`中安装所有必需的头文件，库和工具。
 
-## Building LLVM-9 From Sources
-Building from sources can be slow and tricky to debug. It is not necessary, but
-might be your preferred way of obtaining LLVM-9. The following steps will work
-on Linux and Mac OS X:
+## 从源代码构建LLVM-9
+
+从源代码进行构建可能很慢且难以调试。这不是必需的，但它可能是获取LLVM-9的首选方法。在Linux和Mac OS X上运行以下步骤：
 ```bash
 git clone https://github.com/llvm/llvm-project.git
 cd llvm-project
@@ -136,58 +119,44 @@ cd build
 cmake -DCMAKE_BUILD_TYPE=Release -DLLVM_TARGETS_TO_BUILD=X86 <llvm-project/root/dir>/llvm/
 cmake --build .
 ```
-For more details read the [official
-documentation](https://llvm.org/docs/CMake.html).
+有关更多详细信息，请阅读[官方文档](https://llvm.org/docs/CMake.html)。
 
-Building & Testing
+构建&测试
 ===================
-You can build **llvm-tutor** (and all the provided passes) as follows:
+您可以按照以下方式构建**llvm-tutor**（以及所有提供的pass）：
 ```bash
 cd <build/dir>
 cmake -DLT_LLVM_INSTALL_DIR=<installation/dir/of/llvm/9> <source/dir/llvm/tutor>
 make
 ```
 
-The `LT_LLVM_INSTALL_DIR` variable should be set to the root of either the
-installation or build directory of LLVM 9. It is used to locate the
-corresponding `LLVMConfig.cmake` script that is used to set the include and
-library paths.
+`LT_LLVM_INSTALL_DIR` 变量应设置为LLVM 9的安装目录或构建目录的根. 它用于查找`LLVMConfig.cmake`用于设置包含和库路径的相应脚本。
 
-In order to run the tests, you need to install **llvm-lit** (aka **lit**). It's
-not bundled with LLVM 9 packages, but you can install it with **pip**:
+为了运行测试，您需要安装**llvm-lit**（又名**lit**）。它没有与LLVM 9软件包捆绑在一起，但是您可以使用**pip**安装它：
+
 ```bash
 # Install lit - note that this installs lit globally
 pip install lit
 ```
-Running the tests is as simple as:
+运行测试非常简单：
 ```bash
 $ lit <build_dir>/test
 ```
-Voilà! You should see all tests passing.
+瞧！您应该看到所有测试都通过了。
 
-Overview of The Passes
+Passes 概述
 ======================
-   * [**HelloWorld**](#helloworld) - prints the functions in
-     the input module and prints the number of arguments for each
-   * [**InjectFuncCall**](#inject-calls-to-printf-injectfunccall) - instruments
-     the input module by inserting calls to `printf`
-   * [**StaticCallCounter**](#count-compile-time-function-calls-staticcallcounter) - counts
-     direct function calls at compile time
-   * [**DynamicCallCounter**](#count-run-time-function-calls-dynamiccallcounter) - counts
-     direct function calls at run-time
-   * [**MBASub**](#mbasub) - code transformation for integer `sub`
-     instructions
-   * [**MBAAdd**](#mbaadd) - code transformation for 8-bit integer `add`
-     instructions
-   * [**RIV**](#reachable-integer-values-riv) - finds reachable integer values
-     for each basic block
-   * [**DuplicateBB**](#duplicate-basic-blocks-duplicatebb) - duplicates basic
-     blocks, requires **RIV** analysis results
+   * [**HelloWorld**](#helloworld) - 在输入模块中打印函数并打印参数的数量
+   * [**InjectFuncCall**](#inject-calls-to-printf-injectfunccall) - 通过插入对`printf`的调用来检测输入模块
+   * [**StaticCallCounter**](#count-compile-time-function-calls-staticcallcounter) - 编译时的直接函数调用计数
+   * [**DynamicCallCounter**](#count-run-time-function-calls-dynamiccallcounter) - 运行时直接函数调用计数
+   * [**MBASub**](#mbasub) - 整数`sub`指令的代码转换
+   * [**MBAAdd**](#mbaadd) - 8-bit 整数`add`指令的代码转换
+   * [**RIV**](#reachable-integer-values-riv) - 查找每个基本块的可达整数值
+   * [**DuplicateBB**](#duplicate-basic-blocks-duplicatebb) - 重复基本块，需要RIV分析结果
 
-Once you've [built](#build-instructions) this project, you can experiment with
-every pass separately. It is assumed that you have `clang` and `opt` available
-in your `PATH`. All passes work with LLVM files. You can generate one like
-this:
+一旦你建立了这个项目，你就可以分别地进行试验。假设您的机器路径中已经有clang和opt。所有的pass都可以使用LLVM文件。你可以生成一个类似这样的:
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 # Textual form
@@ -195,26 +164,19 @@ $LLVM_DIR/bin/clang  -emit-llvm input.c -S -o out.ll
 # Binary/bit-code form
 $LLVM_DIR/bin/clang  -emit-llvm input.c -o out.bc
 ```
-It doesn't matter whether you choose the binary (without `-S`) or textual
-form (with `-S`), but obviously the latter is more human-friendly. All passes,
-except for [**HelloWorld**](#helloworld), are described below.
+选择二进制形式(没有-S)还是文本形式(有-S)并不是重点，但显然后者对人类更友好。除了HelloWorld之外的所有pass都在下面进行了描述。
 
-## Inject Calls To Printf (**InjectFuncCall**)
-This pass is a _HelloWorld_ example for _code instrumentation_. For every function
-defined in the input module, `InjectFuncCall` will add (_inject_) the following
-call to [`printf`](https://en.cppreference.com/w/cpp/io/c/fprintf):
-```C
+## 注入Printf的调用 (**InjectFuncCall**)
+
+此pass是代码intrumentation的HelloWorld示例。对于输入module中定义的每个函数，InjectFuncCall将添加(注入)以下对printf的调用:
+
+```bash
 printf("(llvm-tutor) Hello from: %s\n(llvm-tutor)   number of arguments: %d\n", FuncName, FuncNumArgs)
 ```
-This call is added at the beginning of each function (i.e. before any other
-instruction). `FuncName` is the name of the function and `FuncNumArgs` is the
-number of arguments that the function takes.
 
-You might have noticed that **InjectFuncCall** is somewhat similar to
-[**HelloWorld**](#helloworld) - in both cases the pass visits all functions,
-prints their names and the number of arguments. To understand the
-difference between the two, lets use `input_for_hello.c` to test
-**InjectFuncCall**:
+这个调用会加到每个函数的开头（例如，在所有其他指令之前）。`FuncName`是这个函数的名字而`FuncNumArgs`是这个函数携带的参数数量。
+
+你可能会注意到**InjectFuncCall**与**HelloWorld**有些类似，在两个例子中，pass都会访问所有函数，打印它们的函数名以及参数数量。为了去理解这两个例子的区别，让我们使用`input_for_hello.c`来测试**InjectFuncCall**:
 
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
@@ -223,11 +185,10 @@ $LLVM_DIR/bin/clang  -emit-llvm -c <source_dir>/inputs/input_for_hello.c -o inpu
 # Run the pass through opt
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libInjectFuncCall.dylib -legacy-inject-func-call input_for_hello.bc -o instrumented.bin
 ```
-This generates `instrumented.bin`, which is the instrumented version of
-`input_for_hello.bc`. In order to verify that **InjectFuncCall** worked as
-expected, you can either check the output file (and verify that it contains
-extra calls to `printf`) or run it:
-```
+
+上述指令会生成`instrumented.bin`，它是`input_for_hello.bc`的instrumented版本。为了验证**InjectFuncCall**是否像我们期望的那样执行，你可以检查输出文件（并验证它是否包含对`pritf`的额外调用）或者直接运行它：
+
+```bash
 $LLVM_DIR/bin/lli instrumented.bin
 (llvm-tutor) Hello from: main
 (llvm-tutor)   number of arguments: 2
@@ -244,24 +205,21 @@ $LLVM_DIR/bin/lli instrumented.bin
 (llvm-tutor) Hello from: foo
 (llvm-tutor)   number of arguments: 1
 ```
-The output is indeed similar to what [**HelloWorld**](#helloworld) would
-generate. However, the number of times `Hello from` is printed is different.
-Indeed, with **InjectFuncCall** it is printed whenever a function is called,
-whereas for **HelloWorld** it is only printed once per function definition. This
-makes perfect sense and hints how different the two passes are. _Whether to
-print `Hello`_ is determined at:
-* compile time (when the pass is run) for **HelloWorld**, and
-* run-time (when the instrumented module is run) for **InjectFuncCall**.
 
-Last but not least, note that in the case of **InjectFuncCall** we had to run
-the pass with **opt** and then execute the instrumented IR module in order to see the
-output. For **HelloWorld** running the pass with **opt** was sufficient.
+这个输出内容与**HelloWorld**例子输出内容确实非常相似。但是，两者打印`Hello from`的次数不同。实际上，在**InjectFuncCall**中，每当调用一个函数时，都会打印一次`Hello from`，而在HelloWorld中，只在函数定义时打印一次。这很有道理，也暗示了这两种方法的不同之处。是否打印`Hello`是通过以下决定:
 
-## Count Compile Time Function Calls (**StaticCallCounter**)
-`StaticCallCounter` will count the number of function calls in the input
-LLVM file that are visible during the compilation (i.e. if a function is
-called within a loop, that counts as one call). Only direct function calls are
-considered (TODO: Expand).
+- HelloWorld的编译时(pass运行时)
+
+- InjectFuncCall的运行时(instrumented module模块运行时)。
+
+最后但并非最不重要的是，注意在InjectFuncCall的情况下，我们必须使用opt运行pass，然后执行仪表化的IR模块来查看输出。对于HelloWorld来说，使用opt进行传球就足够了。
+
+最后，注意在**InjectFuncCall**情况下，我们必须通过opt运行pass，然后执行instrumented IR module来查看输出。对于**HelloWorld**来说，通过opt运行pass就足够了。
+
+## 编译时函数调用计数(**StaticCallCounter**)
+
+StaticCallCounter将会对编译期间可见的那些输入的LLVM文件中的函数调用进行计数（例如，如果一个函数在一个循环中被调用，这种调用只计数一次）。只考虑直接的函数调用。
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 # Generate an LLVM file to analyze
@@ -269,21 +227,12 @@ $LLVM_DIR/bin/clang  -emit-llvm -c <source_dir>/inputs/input_for_cc.c -o input_f
 # Run the pass through opt
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libStaticCallCounter.dylib -legacy-static-cc -analyze input_for_cc.bc
 ```
-The `static` executable is a command line wrapper that allows you to run
-`StaticCallCounter` without the need for `opt`:
-```bash
-<build_dir>/bin/static input_for_cc.bc
-```
 
-## Count Run-Time Function Calls (**DynamicCallCounter**)
-`DynamicCallCounter` will count the number of run-time function calls. It does
-so by instrumenting the input LLVM file - it inserts call-counting instructions
-that are executed every time a function is called. This pass will only count
-calls to functions that are _defined_ in the input module are counted.
+## 运行时函数调用计数(**DynamicCallCounter**)
 
-Although the primary goal of this pass is to _analyse_ function calls, it also
-modifies the input file. Therefore it is a transformation/instrumentation pass.
-You can test	it with one of the provided examples, e.g.:
+DynamicCallCounter将会对运行时的函数调用进行计数。通过instrumenting输入文件来实现，我们要做的就是插入call-counting指令，然后每当函数被调用时执行该指令。这个pass仅会对那些被定义于要计数的module中的函数进行计数。
+
+尽管这个pass的主要目标是分析函数计数，但它还是修改了输入文件。因此它是一个transformation或者instrumentation的pass。通过以下所提供的例子进行测试：
 
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
@@ -294,8 +243,10 @@ $LLVM_DIR/bin/opt -load <build_dir>/lib/libDynamicCallCounter.dylib -legacy-dyna
 # Run the instrumented binary
 ./instrumented_bin
 ```
-You will see the following output:
-```
+
+你将会看到以下输出：
+
+```bash
 =================================================
 LLVM-TUTOR: dynamic analysis results
 =================================================
@@ -307,25 +258,20 @@ fez                  1
 main                 1
 ```
 
-If you are interested in a more introductory example for code instrumentation,
-you may want experiment with [**InjectFuncCall**](#injectfunccall) first.
+如果您对一个关于instrumentation代码的介绍性示例感兴趣，那么您可能想先尝试一下InjectFuncCall。
 
-## Mixed Boolean Arithmetic Transformations
-These passes implement [mixed
-boolean arithmetic](https://tel.archives-ouvertes.fr/tel-01623849/document)
-transformations. Similar transformation are often used in code obfuscation (you
-may also know them from [Hacker's
-Delight](https://www.amazon.co.uk/Hackers-Delight-Henry-S-Warren/dp/0201914654))
-and are a great illustration of what and how LLVM passes can be used for.
+## 混合布尔算术转换
+
+这些pass实现了[混合布尔算术转换](https://tel.archives-ouvertes.fr/tel-01623849/document)。在代码混淆中通常使用类似的转换（您也可以从[Hacker's Delight中](https://www.amazon.co.uk/Hackers-Delight-Henry-S-Warren/dp/0201914654)了解它们），并且很好地说明了LLVM传递可以用于什么以及如何使用。
 
 ### **MBASub**
-The **MBASub** pass implements this rather basic expression:
+**MBASub** pass实现了下面这个相当基础的表达式:
+
 ```
 a - b == (a + ~b) + 1
 ```
-Basically, it replaces all instances of integer `sub` according to the above
-formula. The corresponding LIT tests verify that both the formula  and that the
-implementation are correct. You can run this pass as follows:
+基本上，它根据上述公式替换了所有整数除法的实例，相应的LIT测试可以验证公式和实现是否正确。您可以如下运行此过程：
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -emit-llvm -S inputs/input_for_mba_sub.c -o input_for_sub.ll
@@ -333,73 +279,58 @@ $LLVM_DIR/bin/opt -load <build_dir>/lib/libMBASub.so -legacy-mba-sub input_for_s
 ```
 
 ### **MBAAdd**
-The **MBAAdd** pass implements a slightly more involved formula that is only
-valid for 8 bit integers:
+**MBAAdd** pass实现了一个稍微复杂的公式，它仅适用于8位整数：
+
 ```
 a + b == (((a ^ b) + 2 * (a & b)) * 39 + 23) * 151 + 111
 ```
-Similarly to `MBASub`, it replaces all instances of integer `add` according to
-the above identity, but only for 8-bit integers. The LIT tests verify that both
-the formula and the implementation are correct. You can run **MBAAdd** like this:
+它会根据上述标识替换所有的整数`add`指令实例，但仅适用于8位整数。LIT测试验证公式和实现是否正确。您可以像这样运行**MBAAdd**：
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -O1 -emit-llvm -S inputs/input_for_mba.c -o input_for_mba.ll
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libMBAAdd.so -legacy-mba-add input_for_mba.ll -o out.ll
 ```
-You can also specify the level of _obfuscation_ on a scale of `0.0` to `1.0`, with
-`0` corresponding to no obfuscation and `1` meaning that all `add` instructions
-are to be replaced with `(((a ^ b) + 2 * (a & b)) * 39 + 23) * 151 + 111`, e.g.:
+您还可以指定_混淆_的级别，范围为0.0到1.0。`0`表示没有混淆，`1`表示所有`add`指令
+将被替换为`(((a ^ b) + 2 * (a & b)) * 39 + 23) * 151 + 111`，例如:
+
 ```bash
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libMBAAdd.so -legacy-mba-add -mba-ratio=0.3 inputs/input_for_mba.c -o out.ll
 ```
 
-## Reachable Integer Values (**RIV**)
-For each basic block in a module, **RIV** calculates the reachable integer
-values (i.e.  values that can be used in the particular basic block).  There
-are a few LIT tests that verify that indeed this is correct. You can run this
-pass as follows:
+## 可达整数值 (**RIV**)
+
+对于模块中的每个基本块，**RIV**计算可达的整数值（即可以在特定基本块中使用的值）。有一些LIT测试可以验证这确实是正确的。您可以通过以下方式运行pass：
+
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libRIV.so -riv inputs/input_for_riv.c
 ```
 
-Note that this pass, unlike previous passes, will produce information
-only about the IR representation of the original module. It won't be very
-useful if trying to understand the original C or C++ input file.
+请注意，与之前的流程不同，此流程将仅生成有关原始模块的IR表示的信息。 如果想要了解原始的C或C ++输入文件，它将不会很有用。
 
-## Duplicate Basic Blocks (**DuplicateBB**)
-This pass will duplicate all basic blocks in a module, with the exception of
-basic blocks for which there are no reachable integer values (identified
-through the **RIV** pass). An example of such a basic block is the entry block
-in a function that:
-* takes no arguments and
-* is embedded in a module that defines no global values.
+## 重复基本块 (**DuplicateBB**)
 
-This pass depends on the **RIV** pass, hence you need to load it too in order
-for **DuplicateBB** to work:
+这个pass将复制模块中的所有基本块，但没有可达整数值（通过**RIV** pass标识）的基本块除外。这种基本块的一个示例是函数中的入口块，该入口块：
+* 不带参数，
+* 嵌入在未定义全局值的模块中。
+
+该pass依赖于**RIV** pass，因此您也需要加载它以使**DuplicateBB**起作用：
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libRIV.so -load <build_dir>/lib/libDuplicateBB.so -riv inputs/input_for_duplicate_bb.c
 ```
-Basic blocks are duplicated by inserting an `if-then-else` construct and
-cloning all the instructions (with the exception of [PHI
-nodes](https://en.wikipedia.org/wiki/Static_single_assignment_form)) into the
-new blocks.
+通过插入`if-then-else`构造并将所有指令（[PHI节点](https://en.wikipedia.org/wiki/Static_single_assignment_form)除外）克隆到新的基本块中来复制基本块。
 
-Debugging
-==========
-Before running a debugger, you may want to analyze the output from
-[LLVM_DEBUG](http://llvm.org/docs/ProgrammersManual.html#the-llvm-debug-macro-and-debug-option)
-and
-[STATISTIC](http://llvm.org/docs/ProgrammersManual.html#the-statistic-class-stats-option)
-macros. For example, for **MBAAdd**:
+# 调试
+
+在运行调试器之前，您可能需要分析[LLVM_DEBUG](http://llvm.org/docs/ProgrammersManual.html#the-llvm-debug-macro-and-debug-option) 和 [STATISTIC](http://llvm.org/docs/ProgrammersManual.html#the-statistic-class-stats-option) 宏的输出 。例如，对于**MBAAdd**：
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -emit-llvm -S -O1 inputs/input_for_mba.c -o input_for_mba.ll
 $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.dylib -passes=mba-add input_for_mba.ll -debug-only=mba-add -stats -o out.ll
 ```
-Note the `-debug-only=mba-add` and `-stats` flags in the command line - that's
-what enables the following output:
+请注意命令行中的`-debug-only=mba-add`和`-stats`标志——这将启用以下输出：
 ```bash
   %12 = add i8 %1, %0 ->   <badref> = add i8 111, %11
   %20 = add i8 %12, %2 ->   <badref> = add i8 111, %19
@@ -410,16 +341,12 @@ what enables the following output:
 
 3 mba-add - The # of substituted instructions
 ```
-As you can see, you get a nice summary from **MBAAdd**. In many cases this will
-be sufficient to understand what might be going wrong.
+如您所见，您从**MBAAdd**获得了不错的概要。在许多情况下，这足以了解可能出了什么问题。
 
-For tricker issues just use a debugger. Below I demonstrate how to debug
-[**MBAAdd**](#mbaadd). More specifically, how to set up a breakpoint on entry
-to `MBAAdd::run`. Hopefully that will be sufficient for you to start.
+对于棘手的问题，只需使用debugger即可。下面我将演示如何调试 [**MBAAdd**](https://github.com/MAY1994/llvm-tutor#mbaadd)。更具体地说，如何在进入`MBAAdd::run`时设置断点。希望这足以使您开始。
 
 ## Mac OS X
-The default debugger on OS X is [LLDB](http://lldb.llvm.org). You will
-normally use it like this:
+OS X上的默认调试器是[LLDB](http://lldb.llvm.org/)。通常，您将像这样使用它：
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -emit-llvm -S -O1 inputs/input_for_mba.c -o input_for_mba.ll
@@ -427,7 +354,7 @@ lldb -- $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.dylib -pas
 (lldb) breakpoint set --name MBAAdd::run
 (lldb) process launch
 ```
-or, equivalently, by using LLDBs aliases:
+或等效地，通过使用LLDB别名：
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -emit-llvm -S -O1 inputs/input_for_mba.c -o input_for_mba.ll
@@ -435,11 +362,10 @@ lldb -- $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.dylib -pas
 (lldb) b MBAAdd::run
 (lldb) r
 ```
-At this point, LLDB should break at the entry to `MBAAdd::run`.
+此时，LLDB应该在`MBAAdd::run`的入口处中断。
 
 ## Ubuntu
-On most Linux systems, [GDB](https://www.gnu.org/software/gdb/) is the most
-popular debugger. A typical session will look like this:
+在大多数Linux系统上，[GDB](https://www.gnu.org/software/gdb/) 是最受欢迎的调试器。一个典型的例子如下所示：
 ```bash
 export LLVM_DIR=<installation/dir/of/llvm/9>
 $LLVM_DIR/bin/clang -emit-llvm -S -O1 inputs/input_for_mba.c -o input_for_mba.ll
@@ -447,56 +373,42 @@ gdb --args $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.so -pas
 (gdb) b MBAAdd.cpp:MBAAdd::run
 (gdb) r
 ```
-At this point, GDB should break at the entry to `MBAAdd::run`.
+此时，GDB 应该在`MBAAdd::run`的入口处中断。
 
-About Pass Managers in LLVM
-===========================
-LLVM is a quite complex project (to put it mildly) and passes lay at its
-center - this is true for any [multi-pass
-compiler](https://en.wikipedia.org/wiki/Multi-pass_compiler<Paste>). In order
-to manage the passes, a compiler needs a pass manager. LLVM currently enjoys
-not one, but two pass manager. This is important, because depending on which
-pass manager you decide to use, the implementation (and in particular pass
-registration) will look slightly differently. I have tried my best to make the
-distinction in the source code very clear.
+# 关于LLVM中的Pass Managers
 
-## Overview of Pass Managers in LLVM
-As mentioned earlier, there are two pass managers in LLVM:
-* _Legacy Pass Manager_ which currently is the default pass manager
-	* It is implemented in the _legacy_ namespace
-	* It is very well [documented](http://llvm.org/docs/WritingAnLLVMPass.html)
-		(more specifically, writing and registering a pass withing the Legacy PM is
-		very well documented)
-* _New Pass Manager_ aka [_Pass Manager_](https://github.com/llvm-mirror/llvm/blob/ff8c1be17aa3ba7bacb1ef7dcdbecf05d5ab4eb7/include/llvm/IR/PassManager.h#L458) (that's how it's referred to in the code base)
-	* I understand that it is [soon to become](http://lists.llvm.org/pipermail/llvm-dev/2019-August/134326.html) the default pass manager in LLVM
-	* The source code is very throughly commented, but otherwise I am only aware of
+LLVM是一个相当复杂的项目(to put it mildly)，而传递则位于其中心--对于任何[multi-pass
+编译器](https://en.wikipedia.org/wiki/Multi-pass_compiler<Paste>)都是如此。为了管理pass，编译器需要Pass Managers。LLVM现在有两个Pass Managers。这很重要，因为根据您的决定使用哪个Pass Managers，实现（尤其是pass注册）会稍有不同。我已尽力使源代码中的区别非常清楚。
+
+## LLVM中的Pass Managers概述
+
+像前面提到的, LLVM中有两个pass managers:
+* _Legacy Pass Manager_，当前是默认的通行证管理器
+	* 在_legacy_ namespace中实现
+	* 有很好的[文档](http://llvm.org/docs/WritingAnLLVMPass.html)（更确切地说，有关于用Legacy PM编写和注册pass的文档也很好）
+* _New Pass Manager_ 又名[_Pass Manager_](https://github.com/llvm-mirror/llvm/blob/ff8c1be17aa3ba7bacb1ef7dcdbecf05d5ab4eb7/include/llvm/IR/PassManager.h#L458)（这就是在代码库中的引用方式）
+	* 我知道它将[很快成为](http://lists.llvm.org/pipermail/llvm-dev/2019-August/134326.html) LLVM中的默认通行证管理器
+	* 源代码有非常详尽的注释, but otherwise I am only aware of
 		this great [blog series](https://medium.com/@mshockwave/writing-llvm-pass-in-2018-preface-6b90fa67ae82) by Min-Yih Hsu.
 
-The best approach is to implement your passes for both pass managers.
-Fortunately, once you have an implementation that works for one of them, it's
-relatively straightforward to extend it so that it works for the other one as
-well. All passes in LLVM provide an interface for both and that's what I've
-been trying to achieve here as well.
+最好的方法是为两个pass manager都实现你的pass。幸运的是，一旦您有一个适用于其中一个的实现，则将其进行相对较简单的扩展使其同样适用于另一个即可。LLVM中的所有pass都为这两者提供了一个接口，这也是我一直试图在此实现的接口。
 
 ## New vs Legacy PM When Running Opt
-**MBAAdd** implements interface for both pass managers. This is how you will
-use it via the legacy pass manager:
+**MBAAdd**为两个pass manager都实现了接口。这是legacy pass manager运行它的方式：
+
 ```bash
 $LLVM_DIR/bin/opt -load <build_dir>/lib/libMBAAdd.so -legacy-mba-add input_for_mba.ll -o out.ll
 ```
 
-And this is how you run it with the new pass manager:
+这就是使用new pass manager运行它的方式：
 ```bash
 $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.so -passes=mba-add input_for_mba.ll -o out.ll
 ```
-There are two differences:
-* the way you load your plugins: `-load` vs `-load-pass-plugin`
-* the way you specify which pass/plugin to run: `-legacy-mba-add` vs
-  `-passes=mba-add`
+有两个区别：
+* 插件加载方式：`-load` vs `-load-pass-plugin`
+* 您指定运行哪个pass/plugin的方式：`-legacy-mba-add` vs `-passes=mba-add`
 
-The command line option is different because with the legacy pass manager you
-_register_ a new command line option with **opt** and with the new pass manager
-you just define the pass pipeline (via `-passes=`).
+命令行选项有所不同，因为使用legacy pass manager可以向**opt** *注册*一个新的命令行选项，而使用new pass manager只需定义pass pipeline 即可（通过`-passes=`）。
 
 Credits
 ========
@@ -533,7 +445,7 @@ I have learnt a great deal from it, thank you! I always look-up to those of us
 brave and bright enough to work in academia - thank you for driving the
 education and research forward!
 
-## References
+## 参考
 Below is a list of LLVM resources available outside the official online
 documentation that I have found very helpful. Where possible, the items are sorted by
 date.
