@@ -150,8 +150,8 @@ Passes概述
    * [**InjectFuncCall**](#注入Printf的调用 (**InjectFuncCall**)) - 通过插入对`printf`的调用来检测输入模块
    * [**StaticCallCounter**](#编译时函数调用计数(**StaticCallCounter**)) - 编译时的直接函数调用计数
    * [**DynamicCallCounter**](#运行时函数调用计数(**DynamicCallCounter**)) - 运行时直接函数调用计数
-   * [**MBASub**](#MBASub混合布尔算术转换) - 整数`sub`指令的代码转换
-   * [**MBAAdd**](#MBASub混合布尔算术转换) - 8-bit 整数`add`指令的代码转换
+   * [**MBASub**](#mbasub) - 整数`sub`指令的代码转换
+   * [**MBAAdd**](#mbaadd) - 8-bit 整数`add`指令的代码转换
    * [**RIV**](#可达整数值 (**RIV**)) - 查找每个基本块的可达整数值
    * [**DuplicateBB**](#重复基本块 (**DuplicateBB**)) - 重复基本块，需要RIV分析结果
 
