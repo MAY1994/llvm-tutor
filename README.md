@@ -24,22 +24,22 @@ llvm-tutor是一个自包含引用LLVM pass的集合。这是一个针对新手�
 
 除了代码本身，源文件还包含一些注释，这些注释将指导您完成实现。所有示例均辅以LIT测试，这些测试可验证每次通过是否按预期进行。
 
-最基本的介绍性示例见：[**HelloWorld**](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/)。这是一个带有专用`CMake`脚本的独立子项目。
+最基本的介绍性示例见：[**HelloWorld**](https://github.com/MAY1994/llvm-tutor/tree/master/HelloWorld/)。这是一个带有专用`CMake`脚本的独立子项目。
 
 ### Table of Contents
 * [HelloWorld](#helloworld)
-* [开发环境](#development-environment)
-* [构建和测试](#building--testing)
-* [Pass概述](#overview-of-the-passes)
-* [调试](#debugging)
-* [关于LLVM中的PassManager](#about-pass-managers-in-llvm)
+* [开发环境](#开发环境)
+* [构建和测试](#构建&测试)
+* [Pass概述](#Passes 概述)
+* [调试](#调试)
+* [关于LLVM中的PassManager](#关于LLVM中的Pass Managers)
 * [Credits & References](#credits)
 * [License](#license)
 
 
 HelloWorld
 ==========
-[HelloWorld.cpp](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/HelloWorld.cpp)中的**HelloWorld** pass是一个自包含的*参考实施例*。 相应的[CMakeLists.txt](https://github.com/banach-space/llvm-tutor/blob/master/HelloWorld/CMakeLists.txt)实现了源外pass的最小设置。
+[HelloWorld.cpp](https://github.com/MAY1994/llvm-tutor/tree/master/HelloWorld/HelloWorld.cpp)中的**HelloWorld** pass是一个自包含的*参考实施例*。 相应的[CMakeLists.txt](https://github.com/MAY1994/llvm-tutor/tree/master/HelloWorld/CMakeLists.txt)实现了源外pass的最小设置。
 
 对于输入模块中定义的每个函数，**HelloWord**均会打印其名称和所用参数的数量。您可以这样构建它：
 
@@ -146,14 +146,14 @@ $ lit <build_dir>/test
 
 Passes 概述
 ======================
-   * [**HelloWorld**](#helloworld) - 在输入模块中打印函数并打印参数的数量
-   * [**InjectFuncCall**](#inject-calls-to-printf-injectfunccall) - 通过插入对`printf`的调用来检测输入模块
-   * [**StaticCallCounter**](#count-compile-time-function-calls-staticcallcounter) - 编译时的直接函数调用计数
-   * [**DynamicCallCounter**](#count-run-time-function-calls-dynamiccallcounter) - 运行时直接函数调用计数
-   * [**MBASub**](#mbasub) - 整数`sub`指令的代码转换
-   * [**MBAAdd**](#mbaadd) - 8-bit 整数`add`指令的代码转换
-   * [**RIV**](#reachable-integer-values-riv) - 查找每个基本块的可达整数值
-   * [**DuplicateBB**](#duplicate-basic-blocks-duplicatebb) - 重复基本块，需要RIV分析结果
+   * [**HelloWorld**](#HelloWorld) - 在输入模块中打印函数并打印参数的数量
+   * [**InjectFuncCall**](#注入Printf的调用 (**InjectFuncCall**)) - 通过插入对`printf`的调用来检测输入模块
+   * [**StaticCallCounter**](#编译时函数调用计数(**StaticCallCounter**)) - 编译时的直接函数调用计数
+   * [**DynamicCallCounter**](#运行时函数调用计数(**DynamicCallCounter**)) - 运行时直接函数调用计数
+   * [**MBASub**](#MBASub混合布尔算术转换) - 整数`sub`指令的代码转换
+   * [**MBAAdd**](#MBASub混合布尔算术转换) - 8-bit 整数`add`指令的代码转换
+   * [**RIV**](#可达整数值 (**RIV**)) - 查找每个基本块的可达整数值
+   * [**DuplicateBB**](#重复基本块 (**DuplicateBB**)) - 重复基本块，需要RIV分析结果
 
 一旦你建立了这个项目，你就可以分别地进行试验。假设您的机器路径中已经有clang和opt。所有的pass都可以使用LLVM文件。你可以生成一个类似这样的:
 
@@ -260,7 +260,7 @@ main                 1
 
 如果您对一个关于instrumentation代码的介绍性示例感兴趣，那么您可能想先尝试一下InjectFuncCall。
 
-## 混合布尔算术转换
+## MBASub混合布尔算术转换
 
 这些pass实现了[混合布尔算术转换](https://tel.archives-ouvertes.fr/tel-01623849/document)。在代码混淆中通常使用类似的转换（您也可以从[Hacker's Delight中](https://www.amazon.co.uk/Hackers-Delight-Henry-S-Warren/dp/0201914654)了解它们），并且很好地说明了LLVM传递可以用于什么以及如何使用。
 
