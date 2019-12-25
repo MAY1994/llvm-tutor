@@ -30,9 +30,9 @@ llvm-tutor是一个自包含引用LLVM pass的集合。这是一个针对新手�
 * [HelloWorld](#helloworld)
 * [开发环境](#开发环境)
 * [构建和测试](#构建&测试)
-* [Pass概述](#Passes 概述)
+* [Pass概述](#Passes概述)
 * [调试](#调试)
-* [关于LLVM中的PassManager](#关于LLVM中的Pass Managers)
+* [关于LLVM中的PassManager](#关于LLVM中的PassManagers)
 * [Credits & References](#credits)
 * [License](#license)
 
@@ -144,7 +144,7 @@ $ lit <build_dir>/test
 ```
 瞧！您应该看到所有测试都通过了。
 
-Passes 概述
+Passes概述
 ======================
    * [**HelloWorld**](#HelloWorld) - 在输入模块中打印函数并打印参数的数量
    * [**InjectFuncCall**](#注入Printf的调用 (**InjectFuncCall**)) - 通过插入对`printf`的调用来检测输入模块
@@ -375,7 +375,7 @@ gdb --args $LLVM_DIR/bin/opt -load-pass-plugin <build_dir>/lib/libMBAAdd.so -pas
 ```
 此时，GDB 应该在`MBAAdd::run`的入口处中断。
 
-# 关于LLVM中的Pass Managers
+# 关于LLVM中的PassManagers
 
 LLVM是一个相当复杂的项目(to put it mildly)，而传递则位于其中心--对于任何[multi-pass
 编译器](https://en.wikipedia.org/wiki/Multi-pass_compiler<Paste>)都是如此。为了管理pass，编译器需要Pass Managers。LLVM现在有两个Pass Managers。这很重要，因为根据您的决定使用哪个Pass Managers，实现（尤其是pass注册）会稍有不同。我已尽力使源代码中的区别非常清楚。
